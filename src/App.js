@@ -6,8 +6,8 @@ const { ethers } = require("ethers");
  * All the constant values required for the game to work.
  * By changing these values we can effect the working of the game.
  */
-const BIRD_HEIGHT = 28;
-const BIRD_WIDTH = 33;
+const BIRD_HEIGHT = 50;
+const BIRD_WIDTH = 50;
 const WALL_HEIGHT = 600;
 const WALL_WIDTH = 400;
 const GRAVITY = 5;
@@ -1423,7 +1423,7 @@ function App() {
         setPicId(picId + 1)
       else
         setPicId(picId - 1)
-    }, 100);
+    }, 500);
     return () => clearInterval(interval);
   },);
 
@@ -1575,7 +1575,7 @@ function App() {
               width={BIRD_WIDTH}
               top={birdpos}
               left={100}
-              image={"./images/${picId}.png"}
+              image={`${process.env.PUBLIC_URL}/images/${picId}.png`}
             />
             <Obj
               height={WALL_HEIGHT - OBJ_GAP - objHeight}
