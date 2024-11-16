@@ -12,7 +12,7 @@ const WALL_HEIGHT = 600;
 const WALL_WIDTH = 400;
 const GRAVITY = 5;
 const OBJ_WIDTH = 52;
-const OBJ_SPEED = 5;
+let OBJ_SPEED = 5;
 let OBJ_GAP = 0;
 
 /**
@@ -1326,6 +1326,7 @@ function App() {
   const [score, setScore] = useState(0);
   const [walletAddress, setWalletAddress] = useState(null);
   const [nftList, setNftList] = useState([]);
+  const [picId, setPicId] = useState(0);
   const [selectedNFT, setSelectedNFT] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isReady, setIsReady] = useState(false);
@@ -1358,16 +1359,7 @@ function App() {
 
   // Function to fetch NFTs for the connected wallet
   const fetchNFTs = async () => {
-    if (walletAddress) {
-      try {
-        const response = await fetch(`https://api.opensea.io/api/v1/assets?owner=${walletAddress}`);
-        const data = await response.json();
-        console.log("NFTs owned:", data.assets);
-        setNftList(data.assets);
-      } catch (error) {
-        console.error("Failed to fetch NFTs", error);
-      }
-    }
+
   };
 
   //End the game when the player hits the bottom of the screen.
@@ -1400,7 +1392,10 @@ function App() {
       setObjPos(WALL_WIDTH);
       OBJ_GAP = Math.floor(Math.random() * 150) + 150 - (score * 2 > 100 ? 100 : score * 2)
       setObjHeight(Math.floor(Math.random() * (WALL_HEIGHT - OBJ_GAP - 100)) + 50);
-      if (isStart) setScore((score) => score + 1);
+      if (isStart) {
+        setScore((score) => score + 1);
+        OBJ_SPEED += 1;
+      };
     }
   }, [isStart, objPos]);
 
@@ -1421,6 +1416,16 @@ function App() {
       setIsGameOver(true);
     }
   }, [isStart, birdpos, objHeight, objPos]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (picId % 2 == 0)
+        setPicId(picId + 1)
+      else
+        setPicId(picId - 1)
+    }, 100);
+    return () => clearInterval(interval);
+  },);
 
   //Handles the player movements.
   useEffect(() => {
@@ -1570,6 +1575,7 @@ function App() {
               width={BIRD_WIDTH}
               top={birdpos}
               left={100}
+              image={"./images/${picId}.png"}
             />
             <Obj
               height={WALL_HEIGHT - OBJ_GAP - objHeight}
@@ -1609,7 +1615,7 @@ const Background = styled.div`
 
 const Bird = styled.div`
   position: absolute;
-  background-image: url("./images/yellowbird-upflap.png");
+  background-image: url(${(props) => props.image});
   background-repeat: no-repeat;
   background-size: ${(props) => props.width}px ${(props) => props.height}px;
   width: ${(props) => props.width}px;
@@ -1749,8 +1755,8 @@ const AddressContainer = styled(Background)`
 
 const ButtonContainer = styled.div`
   display: flex;
-  gap: 20px; /* 增加按钮之间的间距 */
-  margin-top: 20px; /* 在容器顶部增加间距 */
+  gap: 20px; 
+  margin-top: 20px; 
   
   button {
     padding: 15px 30px;
