@@ -7,6 +7,7 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "@vennbuild/venn-dapp-sdk": "^0.8.5",
     "@web3auth/auth-adapter": "^9.4.0",
     "@web3auth/base": "^9.4.0",
     "@web3auth/ethereum-provider": "^9.4.0",
