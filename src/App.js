@@ -1540,13 +1540,19 @@ function App() {
         <GameOverContainer height={WALL_HEIGHT} width={WALL_WIDTH}>
           <h2>Game Over</h2>
           <p>Final Score: {score}</p>
-          <button onClick={MintToken}>
-            Mint Token
-          </button>
-          <button onClick={Redeem}>
-            Redeem NFT
-          </button>
-          <button onClick={() => { setIsGameOver(false); setIsStart(false); setIsReady(false); setScore(0); setBirdpos(300); }}>Restart</button>
+          <ButtonContainer>
+            <button onClick={MintToken}>
+              Mint Token
+            </button>
+            <button onClick={Redeem}>
+              Redeem NFT
+            </button>
+            <button onClick={() => {
+              setIsGameOver(false); setIsStart(false); setIsReady(false); setScore(0); setBirdpos(300);
+            }}>
+              Restart
+            </button>
+          </ButtonContainer>
         </GameOverContainer>
       ) : (
         <>
@@ -1741,6 +1747,27 @@ const AddressContainer = styled(Background)`
   }
 `
 
+const ButtonContainer = styled.div`
+  display: flex;
+  gap: 20px; /* 增加按钮之间的间距 */
+  margin-top: 20px; /* 在容器顶部增加间距 */
+  
+  button {
+    padding: 15px 30px;
+    font-size: 18px;
+    background-color: #28a745;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #218838;
+  }
+`;
+
 const GameOverContainer = styled(Background)`
   display: flex;
   flex-direction: column;
@@ -1762,7 +1789,7 @@ const GameOverContainer = styled(Background)`
     padding: 5px 10px;
     font-size: 18px;
     background-color: #28a745;
-    margin: 30px
+    margin: 20px
     border: none;
     border-radius: 10px;
     color: white;
