@@ -1,6 +1,15 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
+import * as fcl from "@onflow/fcl";
 const { ethers } = require("ethers");
+
+// FCL 
+fcl.config()
+  .put("accessNode.api", "https://rest-testnet.onflow.org")
+  .put("discovery.wallet", "https://fcl-discovery.onflow.org/testnet/authn")
+  .put("app.detail.title", "FlappyNouns")
+  .put("app.detail.icon", `${process.env.PUBLIC_URL}/images/logo.png`);
+
 
 /**
  * All the constant values required for the game to work.
@@ -459,6 +468,24 @@ function App() {
       "inputs": [
         {
           "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        }
+      ],
+      "name": "approve",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
           "name": "_paymentToken",
           "type": "address"
         },
@@ -599,6 +626,19 @@ function App() {
       "inputs": [
         {
           "internalType": "address",
+          "name": "_to",
+          "type": "address"
+        }
+      ],
+      "name": "mint",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
           "name": "owner",
           "type": "address"
         }
@@ -687,6 +727,128 @@ function App() {
       "type": "event"
     },
     {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        }
+      ],
+      "name": "safeTransferFrom",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "data",
+          "type": "bytes"
+        }
+      ],
+      "name": "safeTransferFrom",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "operator",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "approved",
+          "type": "bool"
+        }
+      ],
+      "name": "setApprovalForAll",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_newBaseURI",
+          "type": "string"
+        }
+      ],
+      "name": "setBaseURI",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_newmaxSupply",
+          "type": "uint256"
+        }
+      ],
+      "name": "setmaxSupply",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "setnewpresale",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_newpresalePeriod",
+          "type": "uint256"
+        }
+      ],
+      "name": "setpresalePeriod",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "anonymous": false,
       "inputs": [
         {
@@ -715,6 +877,11 @@ function App() {
       "inputs": [
         {
           "internalType": "address",
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
           "name": "to",
           "type": "address"
         },
@@ -724,9 +891,29 @@ function App() {
           "type": "uint256"
         }
       ],
-      "name": "approve",
+      "name": "transferFrom",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "withdraw",
+      "outputs": [],
+      "stateMutability": "payable",
       "type": "function"
     },
     {
@@ -858,19 +1045,6 @@ function App() {
     },
     {
       "inputs": [],
-      "name": "maxMintAmount",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
       "name": "maxSupply",
       "outputs": [
         {
@@ -880,24 +1054,6 @@ function App() {
         }
       ],
       "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_to",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_mintAmount",
-          "type": "uint256"
-        }
-      ],
-      "name": "mint",
-      "outputs": [],
-      "stateMutability": "payable",
       "type": "function"
     },
     {
@@ -969,141 +1125,6 @@ function App() {
         }
       ],
       "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "renounceOwnership",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "from",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "safeTransferFrom",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "from",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bytes",
-          "name": "data",
-          "type": "bytes"
-        }
-      ],
-      "name": "safeTransferFrom",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "operator",
-          "type": "address"
-        },
-        {
-          "internalType": "bool",
-          "name": "approved",
-          "type": "bool"
-        }
-      ],
-      "name": "setApprovalForAll",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "string",
-          "name": "_newBaseURI",
-          "type": "string"
-        }
-      ],
-      "name": "setBaseURI",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_newmaxMintAmount",
-          "type": "uint256"
-        }
-      ],
-      "name": "setmaxMintAmount",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_newmaxSupply",
-          "type": "uint256"
-        }
-      ],
-      "name": "setmaxSupply",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "setnewpresale",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_newpresalePeriod",
-          "type": "uint256"
-        }
-      ],
-      "name": "setpresalePeriod",
-      "outputs": [],
-      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -1217,61 +1238,6 @@ function App() {
       "inputs": [
         {
           "internalType": "address",
-          "name": "from",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "transferFrom",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "newOwner",
-          "type": "address"
-        }
-      ],
-      "name": "transferOwnership",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_owner",
-          "type": "address"
-        }
-      ],
-      "name": "verifyAsset",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
           "name": "_owner",
           "type": "address"
         }
@@ -1286,37 +1252,14 @@ function App() {
       ],
       "stateMutability": "view",
       "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "name": "whitelisted",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "withdraw",
-      "outputs": [],
-      "stateMutability": "payable",
-      "type": "function"
     }
   ]
 
   const contractAddress_NFT = "0x0E054e9E6c4860e9057c63cFC71B0d474C58F07F";
   const contractAddress_ERC = "0xc39759497912bCEed6DE76d3763250a73Cd9c772";
+
+  const flowAddress_NFT = "0xd86E2e2DC26E19F318737849d9FE4A229241Ca38";
+  const flowAddress_ERC = "0x24Fd0056fa257dcEB08F228c4798f755e839c6D1";
 
   //Changing the game values based on the activities done in the game.
   const [isStart, setIsStart] = useState(false);
@@ -1335,9 +1278,16 @@ function App() {
 
   // Function to handle wallet connection
   const connectWallet = async () => {
+    // try {
+    //   await fcl.authenticate();
+    //   const user = await fcl.currentUser().snapshot();
+    //   console.log("Connected User:", user);
+    // } catch (error) {
+    //   console.error("Wallet connection failed:", error);
+    // }
     if (window.ethereum) {
       try {
-        const targetChainId = 11155111; // Sepolia Chain ID
+        const targetChainId = 545; // Sepolia Chain ID
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const currentChainId = await window.ethereum.request({ method: 'eth_chainId' });
         console.log(currentChainId);
@@ -1494,7 +1444,7 @@ function App() {
   const fetchNFTs = async () => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
-    const nftContract = new ethers.Contract(contractAddress_NFT, contractABI_NFT, signer);
+    const nftContract = new ethers.Contract(flowAddress_NFT, contractABI_NFT, signer);
     const requireTx = await nftContract.walletOfOwner(walletAddress);
     console.log(requireTx);
     let filteredNftList = [0];
@@ -1513,7 +1463,7 @@ function App() {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
 
-    const tokenContract = new ethers.Contract(contractAddress_ERC, contractABI_ERC, signer);
+    const tokenContract = new ethers.Contract(flowAddress_ERC, contractABI_ERC, signer);
     const tx = await tokenContract.mintTokens(score);
     await tx.wait();
     alert('Successfully minted tokens!');
@@ -1523,13 +1473,13 @@ function App() {
     console.log("Redeem NFT");
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
-    const tokenContract = new ethers.Contract(contractAddress_ERC, contractABI_ERC, signer);
-    const nftContract = new ethers.Contract(contractAddress_NFT, contractABI_NFT, signer);
+    const tokenContract = new ethers.Contract(flowAddress_ERC, contractABI_ERC, signer);
+    const nftContract = new ethers.Contract(flowAddress_NFT, contractABI_NFT, signer);
     console.log("approving ......")
-    const approveTx = await tokenContract.approve(contractAddress_NFT, ethers.utils.parseUnits("1", 18));
+    const approveTx = await tokenContract.approve(flowAddress_NFT, ethers.utils.parseUnits("1", 18));
     await approveTx.wait();
     console.log("approved")
-    const mintTx = await nftContract.mint(walletAddress, 1).send({ from: walletAddress, value: 0 });
+    const mintTx = await nftContract.mint(walletAddress);
     console.log("minting......");
     await mintTx.wait();
 
