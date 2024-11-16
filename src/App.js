@@ -1,6 +1,9 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
 import { VennClient } from '@vennbuild/venn-dapp-sdk';
+import { DynamicContextProvider, DynamicWidget } from '@dynamic-labs/sdk-react-core';
+import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
+
 const { ethers } = require("ethers");
 
 const vennURL = "https://dc7sea.venn.build/sign";
@@ -1506,82 +1509,89 @@ function App() {
   }
 
   return (
-    <Home onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onKeyDown={handleKeyDown} onKeyUp={handleKeyUp} tabIndex="0">
-      {!isLoggedIn ? (
-        <LoginContainer height={WALL_HEIGHT} width={WALL_WIDTH}>
-          <h2>
-            FlappyNouns
-          </h2>
-          <button onClick={connectWallet}>Connect Wallet</button>
-        </LoginContainer>
-      ) : (isLoggedIn && !isReady) ? (
-        <AddressContainer height={WALL_HEIGHT} width={WALL_WIDTH}>
-          <h2>Select an NFT as your player:</h2>
-          <NFTList>
-            {nftList.map((nft_id, index) => (
-              <NFTItem key={index} onClick={() => {
-                setSelectedNFT(nft_id);
-                console.log(2 * nft_id);
-              }} selected={selectedNFT === nft_id}>
-                <img src={`${process.env.PUBLIC_URL}/images/${2 * nft_id}.png`} />
-              </NFTItem>
-            ))}
-          </NFTList>
-          <button onClick={handleReadyButton}>
-            Ready!
-          </button>
-        </AddressContainer>
-      ) : (isReady && isLoggedIn && !isStart && !isGameOver) ? (
-        <Startboard height={WALL_HEIGHT} width={WALL_WIDTH}>
-          Click To Start
-        </Startboard>
-      ) : isGameOver ? (
-        <GameOverContainer height={WALL_HEIGHT} width={WALL_WIDTH}>
-          <h2>Game Over</h2>
-          <p>Final Score: {score}</p>
-          <ButtonContainer>
-            <button onClick={MintToken}>
-              Mint Token
+    <DynamicContextProvider
+      settings={{
+        environmentId: '1ab0315b-cde0-4004-ab46-53a2033a410b',
+        walletConnectors: [ EthereumWalletConnectors ],
+      }}>
+      <DynamicWidget />
+      <Home onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onKeyDown={handleKeyDown} onKeyUp={handleKeyUp} tabIndex="0">
+        {!isLoggedIn ? (
+          <LoginContainer height={WALL_HEIGHT} width={WALL_WIDTH}>
+            <h2>
+              FlappyNouns
+            </h2>
+            <button onClick={connectWallet}>Connect Wallet</button>
+          </LoginContainer>
+        ) : (isLoggedIn && !isReady) ? (
+          <AddressContainer height={WALL_HEIGHT} width={WALL_WIDTH}>
+            <h2>Select an NFT as your player:</h2>
+            <NFTList>
+              {nftList.map((nft_id, index) => (
+                <NFTItem key={index} onClick={() => {
+                  setSelectedNFT(nft_id);
+                  console.log(2 * nft_id);
+                }} selected={selectedNFT === nft_id}>
+                  <img src={`${process.env.PUBLIC_URL}/images/${2 * nft_id}.png`} />
+                </NFTItem>
+              ))}
+            </NFTList>
+            <button onClick={handleReadyButton}>
+              Ready!
             </button>
-            <button onClick={Redeem}>
-              Redeem NFT
-            </button>
-            <button onClick={() => {
-              setIsGameOver(false); setIsStart(false); setIsReady(false); setScore(0); setBirdpos(300); OBJ_SPEED = 5;
-            }}>
-              Restart
-            </button>
-          </ButtonContainer>
-        </GameOverContainer>
-      ) : (
-        <>
-          <ScoreShow>Score: {score}</ScoreShow>
-          <Background height={WALL_HEIGHT} width={WALL_WIDTH}>
-            <Obj
-              height={objHeight}
-              width={OBJ_WIDTH}
-              left={objPos}
-              top={0}
-              deg={180}
-            />
-            <Bird
-              height={BIRD_HEIGHT}
-              width={BIRD_WIDTH}
-              top={birdpos}
-              left={100}
-              image={`${process.env.PUBLIC_URL}/images/${picId}.png`}
-            />
-            <Obj
-              height={WALL_HEIGHT - OBJ_GAP - objHeight}
-              width={OBJ_WIDTH}
-              left={objPos}
-              top={WALL_HEIGHT - (objHeight + (WALL_HEIGHT - OBJ_GAP - objHeight))}
-              deg={0}
-            />
-          </Background>
-        </>
-      )}
-    </Home>
+          </AddressContainer>
+        ) : (isReady && isLoggedIn && !isStart && !isGameOver) ? (
+          <Startboard height={WALL_HEIGHT} width={WALL_WIDTH}>
+            Click To Start
+          </Startboard>
+        ) : isGameOver ? (
+          <GameOverContainer height={WALL_HEIGHT} width={WALL_WIDTH}>
+            <h2>Game Over</h2>
+            <p>Final Score: {score}</p>
+            <ButtonContainer>
+              <button onClick={MintToken}>
+                Mint Token
+              </button>
+              <button onClick={Redeem}>
+                Redeem NFT
+              </button>
+              <button onClick={() => {
+                setIsGameOver(false); setIsStart(false); setIsReady(false); setScore(0); setBirdpos(300); OBJ_SPEED = 5;
+              }}>
+                Restart
+              </button>
+            </ButtonContainer>
+          </GameOverContainer>
+        ) : (
+          <>
+            <ScoreShow>Score: {score}</ScoreShow>
+            <Background height={WALL_HEIGHT} width={WALL_WIDTH}>
+              <Obj
+                height={objHeight}
+                width={OBJ_WIDTH}
+                left={objPos}
+                top={0}
+                deg={180}
+              />
+              <Bird
+                height={BIRD_HEIGHT}
+                width={BIRD_WIDTH}
+                top={birdpos}
+                left={100}
+                image={`${process.env.PUBLIC_URL}/images/${picId}.png`}
+              />
+              <Obj
+                height={WALL_HEIGHT - OBJ_GAP - objHeight}
+                width={OBJ_WIDTH}
+                left={objPos}
+                top={WALL_HEIGHT - (objHeight + (WALL_HEIGHT - OBJ_GAP - objHeight))}
+                deg={0}
+              />
+            </Background>
+          </>
+        )}
+      </Home>
+    </DynamicContextProvider>
   );
 }
 
