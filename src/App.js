@@ -6,8 +6,8 @@ const { ethers } = require("ethers");
  * All the constant values required for the game to work.
  * By changing these values we can effect the working of the game.
  */
-const BIRD_HEIGHT = 50;
-const BIRD_WIDTH = 50;
+const BIRD_HEIGHT = 80;
+const BIRD_WIDTH = 80;
 const WALL_HEIGHT = 600;
 const WALL_WIDTH = 400;
 const GRAVITY = 5;
@@ -1337,7 +1337,7 @@ function App() {
   const connectWallet = async () => {
     if (window.ethereum) {
       try {
-        const targetChainId = 11155111; // Sepolia 测试网的 Chain ID
+        const targetChainId = 11155111; // Sepolia Chain ID
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const currentChainId = await window.ethereum.request({ method: 'eth_chainId' });
         console.log(currentChainId);
@@ -1357,10 +1357,12 @@ function App() {
     }
   };
 
-  // Function to fetch NFTs for the connected wallet
-  const fetchNFTs = async () => {
-
-  };
+  useEffect(() => {
+    if (walletAddress) {
+      console.log("Updated Wallet Address:", walletAddress);
+      fetchNFTs();
+    }
+  }, [walletAddress]);
 
   //End the game when the player hits the bottom of the screen.
   useEffect(() => {
@@ -1419,13 +1421,15 @@ function App() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (picId % 2 == 0)
+      // console.log("last:" + picId);
+      if (picId % 2 === 0)
         setPicId(picId + 1)
       else
         setPicId(picId - 1)
-    }, 500);
+    }, 100);
+    // console.log(picId);
     return () => clearInterval(interval);
-  },);
+  }, [picId]);
 
   //Handles the player movements.
   useEffect(() => {
@@ -1482,7 +1486,26 @@ function App() {
   };
 
   const handleReadyButton = () => {
+    setPicId(selectedNFT * 2);
     setIsReady(true);
+  };
+
+  // Function to fetch NFTs for the connected wallet
+  const fetchNFTs = async () => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const nftContract = new ethers.Contract(contractAddress_NFT, contractABI_NFT, signer);
+    const requireTx = await nftContract.walletOfOwner(walletAddress);
+    console.log(requireTx);
+    let filteredNftList = [0];
+    for (const i of requireTx) {
+      if (i < 5) {
+        console.log(i);
+        filteredNftList.push(i);
+      }
+    }
+    console.log(filteredNftList);
+    setNftList(filteredNftList);
   };
 
   const MintToken = async () => {
@@ -1526,10 +1549,12 @@ function App() {
         <AddressContainer height={WALL_HEIGHT} width={WALL_WIDTH}>
           <h2>Select an NFT as your player:</h2>
           <NFTList>
-            {nftList.map((nft, index) => (
-              <NFTItem key={index} onClick={() => setSelectedNFT(nft.image_url)} selected={selectedNFT === nft.image_url}>
-                <img src={nft.image_url} alt={nft.name} />
-                <p>{nft.name}</p>
+            {nftList.map((nft_id, index) => (
+              <NFTItem key={index} onClick={() => {
+                setSelectedNFT(nft_id);
+                console.log(2 * nft_id);
+              }} selected={selectedNFT === nft_id}>
+                <img src={`${process.env.PUBLIC_URL}/images/${2 * nft_id}.png`} />
               </NFTItem>
             ))}
           </NFTList>
@@ -1553,7 +1578,7 @@ function App() {
               Redeem NFT
             </button>
             <button onClick={() => {
-              setIsGameOver(false); setIsStart(false); setIsReady(false); setScore(0); setBirdpos(300);
+              setIsGameOver(false); setIsStart(false); setIsReady(false); setScore(0); setBirdpos(300); OBJ_SPEED = 5;
             }}>
               Restart
             </button>
@@ -1705,16 +1730,6 @@ const NFTItem = styled.div`
     margin-top: 10px;
     font-size: 14px;
     color: #ffffff;
-  }
-`;
-
-const SelectedNFT = styled.div`
-  margin-top: 20px;
-  text-align: center;
-  img {
-    width: 100px;
-    height: auto;
-    border-radius: 10px;
   }
 `;
 
