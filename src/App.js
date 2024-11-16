@@ -4,6 +4,7 @@ import { VennClient } from '@vennbuild/venn-dapp-sdk';
 const { ethers } = require("ethers");
 
 const vennURL = "https://dc7sea.venn.build/sign";
+
 const vennPolicyAddress = "0x040012eF0Eb5B9C1B4F2F21958A9d141e83d0428";
 
 const vennClient = new VennClient({ vennURL, vennPolicyAddress });
@@ -1459,14 +1460,17 @@ function App() {
     console.log("Minting tokens");
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
-
+  
     const tokenContract = new ethers.Contract(flowAddress_ERC, contractABI_ERC, signer);
+
     const tx = {
       to: flowAddress_ERC,
       from: await signer.getAddress(),
       data: tokenContract.interface.encodeFunctionData("mintTokens", [score]),
       value: 0
     };
+
+
 
     const approvedTransaction = await vennClient.approve(tx);
     const receipt = await signer.sendTransaction(approvedTransaction);
@@ -1480,10 +1484,20 @@ function App() {
     const signer = provider.getSigner();
     const tokenContract = new ethers.Contract(flowAddress_ERC, contractABI_ERC, signer);
     const nftContract = new ethers.Contract(flowAddress_NFT, contractABI_NFT, signer);
-    console.log("approving ......")
-    const approveTx = await tokenContract.approve(flowAddress_NFT, ethers.utils.parseUnits("1", 18));
-    await approveTx.wait();
-    console.log("approved")
+  
+    console.log("approving ......");
+    const approveTx = {
+      to: flowAddress_ERC,
+      from: await signer.getAddress(),
+      data: tokenContract.interface.encodeFunctionData("approve", [flowAddress_NFT, ethers.utils.parseUnits("1", 18)]),
+      value: 0
+    };
+  
+    const approvedApproveTx = await vennClient.approve(approveTx);
+    const approveReceipt = await signer.sendTransaction(approvedApproveTx);
+    await approveReceipt.wait();
+    console.log("approved");
+    
     const mintTx = await nftContract.mint(walletAddress);
     console.log("minting......");
     await mintTx.wait();
