@@ -1,7 +1,12 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
+import { VennClient } from '@vennbuild/venn-dapp-sdk';
 const { ethers } = require("ethers");
 
+const vennURL = "https://dc7sea.venn.build/sign";
+const vennPolicyAddress = "0x040012eF0Eb5B9C1B4F2F21958A9d141e83d0428";
+
+const vennClient = new VennClient({ vennURL, vennPolicyAddress });
 
 /**
  * All the constant values required for the game to work.
@@ -1441,7 +1446,7 @@ function App() {
     console.log(requireTx);
     let filteredNftList = [0];
     for (const i of requireTx) {
-      if (i < 5) {
+      if (i < 9) {
         console.log(i);
         filteredNftList.push(i);
       }
@@ -1456,8 +1461,16 @@ function App() {
     const signer = provider.getSigner();
 
     const tokenContract = new ethers.Contract(flowAddress_ERC, contractABI_ERC, signer);
-    const tx = await tokenContract.mintTokens(score);
-    await tx.wait();
+    const tx = {
+      to: flowAddress_ERC,
+      from: await signer.getAddress(),
+      data: tokenContract.interface.encodeFunctionData("mintTokens", [score]),
+      value: 0
+    };
+
+    const approvedTransaction = await vennClient.approve(tx);
+    const receipt = await signer.sendTransaction(approvedTransaction);
+    await receipt.wait();
     alert('Successfully minted tokens!');
   }
 
@@ -1483,7 +1496,7 @@ function App() {
       {!isLoggedIn ? (
         <LoginContainer height={WALL_HEIGHT} width={WALL_WIDTH}>
           <h2>
-            FlappyBird
+            FlappyNouns
           </h2>
           <button onClick={connectWallet}>Connect Wallet</button>
         </LoginContainer>
