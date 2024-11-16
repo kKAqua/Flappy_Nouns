@@ -1441,7 +1441,7 @@ function App() {
     console.log(requireTx);
     let filteredNftList = [0];
     for (const i of requireTx) {
-      if (i < 5) {
+      if (i < 9) {
         console.log(i);
         filteredNftList.push(i);
       }
