@@ -1483,7 +1483,7 @@ function App() {
       {!isLoggedIn ? (
         <LoginContainer height={WALL_HEIGHT} width={WALL_WIDTH}>
           <h2>
-            FlappyBird
+            FlappyNouns
           </h2>
           <button onClick={connectWallet}>Connect Wallet</button>
         </LoginContainer>
