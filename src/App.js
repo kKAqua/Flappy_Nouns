@@ -1485,10 +1485,20 @@ function App() {
     const signer = provider.getSigner();
     const tokenContract = new ethers.Contract(flowAddress_ERC, contractABI_ERC, signer);
     const nftContract = new ethers.Contract(flowAddress_NFT, contractABI_NFT, signer);
-    console.log("approving ......")
-    const approveTx = await tokenContract.approve(flowAddress_NFT, ethers.utils.parseUnits("1", 18));
-    await approveTx.wait();
-    console.log("approved")
+  
+    console.log("approving ......");
+    const approveTx = {
+      to: flowAddress_ERC,
+      from: await signer.getAddress(),
+      data: tokenContract.interface.encodeFunctionData("approve", [flowAddress_NFT, ethers.utils.parseUnits("1", 18)]),
+      value: 0
+    };
+  
+    const approvedApproveTx = await vennClient.approve(approveTx);
+    const approveReceipt = await signer.sendTransaction(approvedApproveTx);
+    await approveReceipt.wait();
+    console.log("approved");
+    
     const mintTx = await nftContract.mint(walletAddress);
     console.log("minting......");
     await mintTx.wait();
