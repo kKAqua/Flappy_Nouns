@@ -29,6 +29,7 @@ function App() {
   const [walletAddress, setWalletAddress] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [isAscending, setIsAscending] = useState(false);
 
   // Function to handle wallet connection
   const connectWallet = async () => {
@@ -57,7 +58,7 @@ function App() {
       setIsGameOver(true);
     }
     return () => clearInterval(intVal);
-  });
+  }, [isStart, birdpos]);
 
   //Generating the pipes(obstacles) for the game.
   useEffect(() => {
@@ -95,47 +96,72 @@ function App() {
     }
   }, [isStart, birdpos, objHeight, objPos]);
 
-  useEffect(() => {
-    const handleKeyPress = (e) => {
-      if (e.code === 'Space') {
-        setIsStart(true);
-        setIsGameOver(false);
-        setBirdpos((prev) => prev - 30);
-      }
-    };
-
-    window.addEventListener('keypress', handleKeyPress);
-
-    return () => {
-      window.removeEventListener('keypress', handleKeyPress);
-    };
-  }, [isStart, birdpos]); // Add isStart and birdpos to the dependency list  
-
   //Handles the player movements.
-  const handler = () => {
-    if (!isStart) setIsStart(true);
-    else if (birdpos < BIRD_HEIGHT) setBirdpos(0);
-    else setBirdpos((birdpos) => birdpos - 50);
+  useEffect(() => {
+    let ascendInterval;
+    let velocity = -10;
+    if (isAscending && isStart && !isGameOver) {
+      ascendInterval = setInterval(() => {
+        setBirdpos((prev) => {
+          if (prev + velocity <= 0) {
+            clearInterval(ascendInterval);
+            return 0;
+          }
+          return prev + velocity;
+        });
+      }, 24);
+    }
+    else if (!isAscending && isStart && !isGameOver) {
+      ascendInterval = setInterval(() => {
+        setBirdpos((prev) => {
+          if (prev + velocity <= 0) {
+            clearInterval(ascendInterval);
+            return 0;
+          }
+          velocity += 1;
+          return velocity < 0 ? (prev + velocity) : prev;
+        });
+      }, 24);
+    }
+    return () => clearInterval(ascendInterval);
+  }, [isAscending, isStart, isGameOver]);
+
+  const handleMouseDown = () => {
+    if (!isStart && isLoggedIn) {
+      setIsStart(true);
+    } else if (isStart && !isGameOver) {
+      setIsAscending(true);
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsAscending(false);
   };
 
   const handleKeyDown = (event) => {
-    // Check if the pressed key is the spacebar
-    if (event.key === ' ' || event.key === 'Spacebar') {
-      // Prevent the default behavior to avoid scrolling the page
-      event.preventDefault();
+    if (event.code === 'Space') {
+      handleMouseDown();
+    }
+  };
 
-      // Trigger the click event
-      handler();
+  const handleKeyUp = (event) => {
+    if (event.code === 'Space') {
+      handleMouseUp();
     }
   };
 
   return (
-    //Whole body of the game.
-    <Home onClick={handler} onKeyDown={handleKeyDown} tabIndex="0">
+    <Home onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onKeyDown={handleKeyDown} onKeyUp={handleKeyUp} tabIndex="0">
       {!isLoggedIn ? (
         <LoginContainer height={WALL_HEIGHT} width={WALL_WIDTH}>
-          <button onClick={connectWallet}>Connect Wallet to Start</button>
+          <button onClick={connectWallet}>Connect Wallet</button>
+          {!isLoggedIn && <Startboard>Click To Start</Startboard>}
         </LoginContainer>
+      ) : (isLoggedIn && !isStart && !isGameOver) ? (
+        <AddressContainer height={WALL_HEIGHT} width={WALL_WIDTH}>
+          <h2>Click To Start!</h2>
+          <Startboard>Click To Start</Startboard>
+        </AddressContainer>
       ) : isGameOver ? (
         <GameOverContainer height={WALL_HEIGHT} width={WALL_WIDTH}>
           <h2>Game Over</h2>
@@ -146,7 +172,6 @@ function App() {
         <>
           <ScoreShow>Score: {score}</ScoreShow>
           <Background height={WALL_HEIGHT} width={WALL_WIDTH}>
-            {!isStart ? <Startboard>Click To Start</Startboard> : null}
             <Obj
               height={objHeight}
               width={OBJ_WIDTH}
@@ -264,6 +289,41 @@ const LoginContainer = styled(Background)`
     background-color: #0056b3;
   }
 `;
+
+const AddressContainer = styled(Background)`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  border-radius: 20px;
+  color: white;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.7);
+  h2 {
+    font-size: 40px;
+    margin-bottom: 25px;
+    color: #f0db4f;
+  }
+  p {
+    font-size: 22px;
+    margin-bottom: 25px;
+    color: #ffffff;
+  }
+  button {
+    padding: 15px 30px;
+    font-size: 18px;
+    background-color: #ff4500;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #e03e00;
+  }
+`
 
 const GameOverContainer = styled(Background)`
   display: flex;
