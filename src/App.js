@@ -1,14 +1,6 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
-import * as fcl from "@onflow/fcl";
 const { ethers } = require("ethers");
-
-// FCL 
-fcl.config()
-  .put("accessNode.api", "https://rest-testnet.onflow.org")
-  .put("discovery.wallet", "https://fcl-discovery.onflow.org/testnet/authn")
-  .put("app.detail.title", "FlappyNouns")
-  .put("app.detail.icon", `${process.env.PUBLIC_URL}/images/logo.png`);
 
 
 /**
@@ -21,7 +13,7 @@ const WALL_HEIGHT = 600;
 const WALL_WIDTH = 400;
 const GRAVITY = 5;
 const OBJ_WIDTH = 52;
-let OBJ_SPEED = 5;
+let OBJ_SPEED = 3;
 let OBJ_GAP = 0;
 
 /**
@@ -1287,18 +1279,18 @@ function App() {
     // }
     if (window.ethereum) {
       try {
-        const targetChainId = 545; // Sepolia Chain ID
+        const targetChainId = 545;
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const currentChainId = await window.ethereum.request({ method: 'eth_chainId' });
         console.log(currentChainId);
         setWalletAddress(accounts[0]);
         setIsLoggedIn(true);
-        if (parseInt(currentChainId, 16) !== targetChainId) {
-          await window.ethereum.request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId: `0x${targetChainId.toString(16)}` }],
-          });
-        }
+        // if (parseInt(currentChainId, 16) !== targetChainId) {
+        //   await window.ethereum.request({
+        //     method: 'wallet_switchEthereumChain',
+        //     params: [{ chainId: `0x${targetChainId.toString(16)}` }],
+        //   });
+        // }
       } catch (error) {
         console.error("Wallet connection failed", error);
       }
@@ -1575,6 +1567,9 @@ const Home = styled.div`
   justify-content: center;
   align-items: center;
   flexDirection: 'column';
+  font-family: "Press Start 2P", system-ui;
+  font-weight: 400;
+  font-style: normal;
 `;
 
 const Background = styled.div`
@@ -1618,15 +1613,21 @@ const Startboard = styled(Background)`
   border-radius: 20px;
   color: white;
   font-size: 30px;
+  font-family: "Press Start 2P", system-ui;
+  font-weight: 400;
+  font-style: normal;
 `;
 
 const ScoreShow = styled.div`
   position: absolute;
   top: 10%;
-  left: 47%;
+  left: 40%;
   z-index: 1;
   font-weight: bold;
   font-size: 30px;
+  font-family: "Press Start 2P", system-ui;
+  font-weight: 400;
+  font-style: normal;
 `;
 
 const LoginContainer = styled(Background)`
@@ -1637,14 +1638,20 @@ const LoginContainer = styled(Background)`
   text-align: center;
   border-radius: 20px;
   color: white;
+  font-family: "Press Start 2P", system-ui;
+  font-weight: 400;
+  font-style: normal;
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
   h2 {
-    font-size: 36px;
+    font-size: 30px;
     margin-bottom: 150px;
   }
   button {
     padding: 15px 30px;
-    font-size: 18px;
+    font-size: 12px;
+    font-family: "Press Start 2P", system-ui;
+    font-weight: 400;
+    font-style: normal;
     background-color: #007bff;
     border: none;
     border-radius: 10px;
@@ -1663,6 +1670,9 @@ const NFTList = styled.div`
   justify-content: center;
   gap: 20px;
   margin-top: 20px;
+  font-family: "Press Start 2P", system-ui;
+  font-weight: 400;
+  font-style: normal;
 `;
 
 const NFTItem = styled.div`
@@ -1671,6 +1681,9 @@ const NFTItem = styled.div`
   cursor: pointer;
   border: ${(props) => (props.selected ? '2px solid #f0db4f' : '2px solid transparent')};
   padding: 10px;
+  font-family: "Press Start 2P", system-ui;
+  font-weight: 400;
+  font-style: normal;
   img {
     width: 100%;
     height: auto;
@@ -1693,6 +1706,9 @@ const AddressContainer = styled(Background)`
   color: white;
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
   background-color: rgba(0, 0, 0, 0.7);
+  font-family: "Press Start 2P", system-ui;
+  font-weight: 400;
+  font-style: normal;
   h2 {
     font-size: 20px;
     margin-bottom: 45px;
@@ -1709,6 +1725,9 @@ const AddressContainer = styled(Background)`
     background-color: #ff4500;
     border: none;
     border-radius: 10px;
+    font-family: "Press Start 2P", system-ui;
+    font-weight: 400;
+    font-style: normal;
     color: white;
     cursor: pointer;
     transition: background-color 0.3s ease;
@@ -1722,10 +1741,15 @@ const ButtonContainer = styled.div`
   display: flex;
   gap: 20px; 
   margin-top: 20px; 
-  
+  font-family: "Press Start 2P", system-ui;
+  font-weight: 400;
+  font-style: normal;
   button {
+    font-family: "Press Start 2P", system-ui;
+    font-weight: 400;
+    font-style: normal;
     padding: 15px 30px;
-    font-size: 18px;
+    font-size: 12px;
     background-color: #28a745;
     border: none;
     border-radius: 10px;
@@ -1747,18 +1771,24 @@ const GameOverContainer = styled(Background)`
   text-align: center;
   border-radius: 20px;
   color: white;
+  font-family: "Press Start 2P", system-ui;
+  font-weight: 400;
+  font-style: normal;
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
   h2 {
     font-size: 36px;
     margin-bottom: 20px;
   }
   p {
-    font-size: 24px;
+    font-size: 20px;
     margin-bottom: 20px;
   }
   button {
-    padding: 5px 10px;
-    font-size: 18px;
+    font-family: "Press Start 2P", system-ui;
+    font-weight: 400;
+    font-style: normal;
+    padding: 5px 5px;
+    font-size: 12px;
     background-color: #28a745;
     margin: 20px
     border: none;
