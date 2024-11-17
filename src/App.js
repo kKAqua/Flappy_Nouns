@@ -1520,7 +1520,7 @@ function App() {
           </h2>
           {/* <DynamicConnectButton onClick={DynamicClick}>Connect Wallet</DynamicConnectButton> */}
           <DynamicWidget />
-          <button onClick={DynamicClick}>Connect Wallet</button>
+          <button onClick={DynamicClick}>Let's GO!</button>
         </LoginContainer>
       ) : (isLoggedIn && !isReady) ? (
         <AddressContainer height={WALL_HEIGHT} width={WALL_WIDTH}>
@@ -1781,21 +1781,21 @@ const ButtonContainer = styled.div`
       font-style: normal;
       button {
         font - family: "Press Start 2P", system-ui;
-      font-weight: 400;
-      font-style: normal;
-      padding: 15px 30px;
-      font-size: 12px;
-      background-color: #28a745;
-      border: none;
-      border-radius: 10px;
-      color: white;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-  }
+        font-weight: 400;
+        font-style: normal;
+        padding: 15px 30px;
+        font-size: 12px;
+        background-color: #28a745;
+        border: none;
+        border-radius: 10px;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
 
       button:hover {
         background - color: #218838;
-  }
+      }
       `;
 
 const GameOverContainer = styled(Background)`
