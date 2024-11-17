@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
 import { VennClient } from '@vennbuild/venn-dapp-sdk';
-import { DynamicContextProvider, DynamicWidget } from '@dynamic-labs/sdk-react-core';
+import { DynamicConnectButton, DynamicWidget, useDynamicContext, DynamicContextProvider } from '@dynamic-labs/sdk-react-core';
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 
 const { ethers } = require("ethers");
@@ -1256,8 +1256,6 @@ function App() {
     }
   ]
 
-  const contractAddress_NFT = "0x0E054e9E6c4860e9057c63cFC71B0d474C58F07F";
-  const contractAddress_ERC = "0xc39759497912bCEed6DE76d3763250a73Cd9c772";
 
   const flowAddress_NFT = "0xd86E2e2DC26E19F318737849d9FE4A229241Ca38";
   const flowAddress_ERC = "0x24Fd0056fa257dcEB08F228c4798f755e839c6D1";
@@ -1276,8 +1274,16 @@ function App() {
   const [isReady, setIsReady] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
   const [isAscending, setIsAscending] = useState(false);
-
+  const { primaryWallet } = useDynamicContext();
   // Function to handle wallet connection
+
+  const DynamicClick = async () => {
+    console.log("Click!")
+    setWalletAddress(primaryWallet.address);
+    console.log(primaryWallet.address);
+    setIsLoggedIn(true);
+  }
+
   const connectWallet = async () => {
     // try {
     //   await fcl.authenticate();
@@ -1288,7 +1294,6 @@ function App() {
     // }
     if (window.ethereum) {
       try {
-        const targetChainId = 545;
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const currentChainId = await window.ethereum.request({ method: 'eth_chainId' });
         console.log(currentChainId);
@@ -1463,7 +1468,7 @@ function App() {
     console.log("Minting tokens");
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
-  
+
     const tokenContract = new ethers.Contract(flowAddress_ERC, contractABI_ERC, signer);
 
     const tx = {
@@ -1472,8 +1477,6 @@ function App() {
       data: tokenContract.interface.encodeFunctionData("mintTokens", [score]),
       value: 0
     };
-
-
 
     const approvedTransaction = await vennClient.approve(tx);
     const receipt = await signer.sendTransaction(approvedTransaction);
@@ -1487,7 +1490,7 @@ function App() {
     const signer = provider.getSigner();
     const tokenContract = new ethers.Contract(flowAddress_ERC, contractABI_ERC, signer);
     const nftContract = new ethers.Contract(flowAddress_NFT, contractABI_NFT, signer);
-  
+
     console.log("approving ......");
     const approveTx = {
       to: flowAddress_ERC,
@@ -1495,12 +1498,12 @@ function App() {
       data: tokenContract.interface.encodeFunctionData("approve", [flowAddress_NFT, ethers.utils.parseUnits("1", 18)]),
       value: 0
     };
-  
+
     const approvedApproveTx = await vennClient.approve(approveTx);
     const approveReceipt = await signer.sendTransaction(approvedApproveTx);
     await approveReceipt.wait();
     console.log("approved");
-    
+
     const mintTx = await nftContract.mint(walletAddress);
     console.log("minting......");
     await mintTx.wait();
@@ -1509,89 +1512,84 @@ function App() {
   }
 
   return (
-    <DynamicContextProvider
-      settings={{
-        environmentId: '1ab0315b-cde0-4004-ab46-53a2033a410b',
-        walletConnectors: [ EthereumWalletConnectors ],
-      }}>
-      <DynamicWidget />
-      <Home onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onKeyDown={handleKeyDown} onKeyUp={handleKeyUp} tabIndex="0">
-        {!isLoggedIn ? (
-          <LoginContainer height={WALL_HEIGHT} width={WALL_WIDTH}>
-            <h2>
-              FlappyNouns
-            </h2>
-            <button onClick={connectWallet}>Connect Wallet</button>
-          </LoginContainer>
-        ) : (isLoggedIn && !isReady) ? (
-          <AddressContainer height={WALL_HEIGHT} width={WALL_WIDTH}>
-            <h2>Select an NFT as your player:</h2>
-            <NFTList>
-              {nftList.map((nft_id, index) => (
-                <NFTItem key={index} onClick={() => {
-                  setSelectedNFT(nft_id);
-                  console.log(2 * nft_id);
-                }} selected={selectedNFT === nft_id}>
-                  <img src={`${process.env.PUBLIC_URL}/images/${2 * nft_id}.png`} />
-                </NFTItem>
-              ))}
-            </NFTList>
-            <button onClick={handleReadyButton}>
-              Ready!
+    <Home onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onKeyDown={handleKeyDown} onKeyUp={handleKeyUp} tabIndex="0">
+      {!isLoggedIn ? (
+        <LoginContainer height={WALL_HEIGHT} width={WALL_WIDTH}>
+          <h2>
+            FlappyNouns
+          </h2>
+          {/* <DynamicConnectButton onClick={DynamicClick}>Connect Wallet</DynamicConnectButton> */}
+          <DynamicWidget />
+          <button onClick={DynamicClick}>Connect Wallet</button>
+        </LoginContainer>
+      ) : (isLoggedIn && !isReady) ? (
+        <AddressContainer height={WALL_HEIGHT} width={WALL_WIDTH}>
+          <h2>Select an NFT as your player:</h2>
+          <NFTList>
+            {nftList.map((nft_id, index) => (
+              <NFTItem key={index} onClick={() => {
+                setSelectedNFT(nft_id);
+                console.log(2 * nft_id);
+              }} selected={selectedNFT === nft_id}>
+                <img src={`${process.env.PUBLIC_URL}/images/${2 * nft_id}.png`} />
+              </NFTItem>
+            ))}
+          </NFTList>
+          <button onClick={handleReadyButton}>
+            Ready!
+          </button>
+        </AddressContainer>
+      ) : (isReady && isLoggedIn && !isStart && !isGameOver) ? (
+        <Startboard height={WALL_HEIGHT} width={WALL_WIDTH}>
+          Click To Start
+        </Startboard>
+      ) : isGameOver ? (
+        <GameOverContainer height={WALL_HEIGHT} width={WALL_WIDTH}>
+          <h2>Game Over</h2>
+          <p>Final Score: {score}</p>
+          <ButtonContainer>
+            <button onClick={MintToken}>
+              Mint Token
             </button>
-          </AddressContainer>
-        ) : (isReady && isLoggedIn && !isStart && !isGameOver) ? (
-          <Startboard height={WALL_HEIGHT} width={WALL_WIDTH}>
-            Click To Start
-          </Startboard>
-        ) : isGameOver ? (
-          <GameOverContainer height={WALL_HEIGHT} width={WALL_WIDTH}>
-            <h2>Game Over</h2>
-            <p>Final Score: {score}</p>
-            <ButtonContainer>
-              <button onClick={MintToken}>
-                Mint Token
-              </button>
-              <button onClick={Redeem}>
-                Redeem NFT
-              </button>
-              <button onClick={() => {
-                setIsGameOver(false); setIsStart(false); setIsReady(false); setScore(0); setBirdpos(300); OBJ_SPEED = 5;
-              }}>
-                Restart
-              </button>
-            </ButtonContainer>
-          </GameOverContainer>
-        ) : (
-          <>
-            <ScoreShow>Score: {score}</ScoreShow>
-            <Background height={WALL_HEIGHT} width={WALL_WIDTH}>
-              <Obj
-                height={objHeight}
-                width={OBJ_WIDTH}
-                left={objPos}
-                top={0}
-                deg={180}
-              />
-              <Bird
-                height={BIRD_HEIGHT}
-                width={BIRD_WIDTH}
-                top={birdpos}
-                left={100}
-                image={`${process.env.PUBLIC_URL}/images/${picId}.png`}
-              />
-              <Obj
-                height={WALL_HEIGHT - OBJ_GAP - objHeight}
-                width={OBJ_WIDTH}
-                left={objPos}
-                top={WALL_HEIGHT - (objHeight + (WALL_HEIGHT - OBJ_GAP - objHeight))}
-                deg={0}
-              />
-            </Background>
-          </>
-        )}
-      </Home>
-    </DynamicContextProvider>
+            <button onClick={Redeem}>
+              Redeem NFT
+            </button>
+            <button onClick={() => {
+              setIsGameOver(false); setIsStart(false); setIsReady(false); setScore(0); setBirdpos(300); OBJ_SPEED = 5;
+            }}>
+              Restart
+            </button>
+          </ButtonContainer>
+        </GameOverContainer>
+      ) : (
+        <>
+          <ScoreShow>Score: {score}</ScoreShow>
+          <Background height={WALL_HEIGHT} width={WALL_WIDTH}>
+            <Obj
+              height={objHeight}
+              width={OBJ_WIDTH}
+              left={objPos}
+              top={0}
+              deg={180}
+            />
+            <Bird
+              height={BIRD_HEIGHT}
+              width={BIRD_WIDTH}
+              top={birdpos}
+              left={100}
+              image={`${process.env.PUBLIC_URL}/images/${picId}.png`}
+            />
+            <Obj
+              height={WALL_HEIGHT - OBJ_GAP - objHeight}
+              width={OBJ_WIDTH}
+              left={objPos}
+              top={WALL_HEIGHT - (objHeight + (WALL_HEIGHT - OBJ_GAP - objHeight))}
+              deg={0}
+            />
+          </Background>
+        </>
+      )}
+    </Home>
   );
 }
 
@@ -1599,242 +1597,242 @@ export default App;
 
 //All the stylesheets required for the game.
 const Home = styled.div`
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flexDirection: 'column';
-  font-family: "Press Start 2P", system-ui;
-  font-weight: 400;
-  font-style: normal;
-`;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flexDirection: 'column';
+      font-family: "Press Start 2P", system-ui;
+      font-weight: 400;
+      font-style: normal;
+      `;
 
 const Background = styled.div`
-  background-image: url("./images/background-day.png");
-  background-repeat: no-repeat;
-  background-size: ${(props) => props.width}px ${(props) => props.height}px;
-  width: ${(props) => props.width}px;
-  height: ${(props) => props.height}px;
-  position: relative;
-  overflow: hidden;
-  border: 2px solid black;
-`;
+      background-image: url("./images/background-day.png");
+      background-repeat: no-repeat;
+      background-size: ${(props) => props.width}px ${(props) => props.height}px;
+      width: ${(props) => props.width}px;
+      height: ${(props) => props.height}px;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid black;
+      `;
 
 const Bird = styled.div`
-  position: absolute;
-  background-image: url(${(props) => props.image});
-  background-repeat: no-repeat;
-  background-size: ${(props) => props.width}px ${(props) => props.height}px;
-  width: ${(props) => props.width}px;
-  height: ${(props) => props.height}px;
-  top: ${(props) => props.top}px;
-  left: ${(props) => props.left}px;
-`;
+      position: absolute;
+      background-image: url(${(props) => props.image});
+      background-repeat: no-repeat;
+      background-size: ${(props) => props.width}px ${(props) => props.height}px;
+      width: ${(props) => props.width}px;
+      height: ${(props) => props.height}px;
+      top: ${(props) => props.top}px;
+      left: ${(props) => props.left}px;
+      `;
 
 const Obj = styled.div`
-  position: relative;
-  background-image: url("./images/pipe-green.png");
-  width: ${(props) => props.width}px;
-  height: ${(props) => props.height}px;
-  left: ${(props) => props.left}px;
-  top: ${(props) => props.top}px;
-  transform: rotate(${(props) => props.deg}deg);
-`;
+      position: relative;
+      background-image: url("./images/pipe-green.png");
+      width: ${(props) => props.width}px;
+      height: ${(props) => props.height}px;
+      left: ${(props) => props.left}px;
+      top: ${(props) => props.top}px;
+      transform: rotate(${(props) => props.deg}deg);
+      `;
 
 const Startboard = styled(Background)`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  border-radius: 20px;
-  color: white;
-  font-size: 30px;
-  font-family: "Press Start 2P", system-ui;
-  font-weight: 400;
-  font-style: normal;
-`;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      border-radius: 20px;
+      color: white;
+      font-size: 30px;
+      font-family: "Press Start 2P", system-ui;
+      font-weight: 400;
+      font-style: normal;
+      `;
 
 const ScoreShow = styled.div`
-  position: absolute;
-  top: 10%;
-  left: 40%;
-  z-index: 1;
-  font-weight: bold;
-  font-size: 30px;
-  font-family: "Press Start 2P", system-ui;
-  font-weight: 400;
-  font-style: normal;
-`;
+      position: absolute;
+      top: 10%;
+      left: 40%;
+      z-index: 1;
+      font-weight: bold;
+      font-size: 30px;
+      font-family: "Press Start 2P", system-ui;
+      font-weight: 400;
+      font-style: normal;
+      `;
 
 const LoginContainer = styled(Background)`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  border-radius: 20px;
-  color: white;
-  font-family: "Press Start 2P", system-ui;
-  font-weight: 400;
-  font-style: normal;
-  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
-  h2 {
-    font-size: 30px;
-    margin-bottom: 150px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      border-radius: 20px;
+      color: white;
+      font-family: "Press Start 2P", system-ui;
+      font-weight: 400;
+      font-style: normal;
+      box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+      h2 {
+        font - size: 30px;
+      margin-bottom: 150px;
   }
-  button {
-    padding: 15px 30px;
-    font-size: 12px;
-    font-family: "Press Start 2P", system-ui;
-    font-weight: 400;
-    font-style: normal;
-    background-color: #007bff;
-    border: none;
-    border-radius: 10px;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+      button {
+        padding: 15px 30px;
+      font-size: 12px;
+      font-family: "Press Start 2P", system-ui;
+      font-weight: 400;
+      font-style: normal;
+      background-color: #007bff;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
   }
-  button:hover {
-    background-color: #0056b3;
+      button:hover {
+        background - color: #0056b3;
   }
-`;
+      `;
 
 const NFTList = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 20px;
-  font-family: "Press Start 2P", system-ui;
-  font-weight: 400;
-  font-style: normal;
-`;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+      font-family: "Press Start 2P", system-ui;
+      font-weight: 400;
+      font-style: normal;
+      `;
 
 const NFTItem = styled.div`
-  width: 100px;
-  text-align: center;
-  cursor: pointer;
-  border: ${(props) => (props.selected ? '2px solid #f0db4f' : '2px solid transparent')};
-  padding: 10px;
-  font-family: "Press Start 2P", system-ui;
-  font-weight: 400;
-  font-style: normal;
-  img {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
+      width: 100px;
+      text-align: center;
+      cursor: pointer;
+      border: ${(props) => (props.selected ? '2px solid #f0db4f' : '2px solid transparent')};
+      padding: 10px;
+      font-family: "Press Start 2P", system-ui;
+      font-weight: 400;
+      font-style: normal;
+      img {
+        width: 100%;
+      height: auto;
+      border-radius: 10px;
   }
-  p {
-    margin-top: 10px;
-    font-size: 14px;
-    color: #ffffff;
+      p {
+        margin - top: 10px;
+      font-size: 14px;
+      color: #ffffff;
   }
-`;
+      `;
 
 const AddressContainer = styled(Background)`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  border-radius: 20px;
-  color: white;
-  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
-  background-color: rgba(0, 0, 0, 0.7);
-  font-family: "Press Start 2P", system-ui;
-  font-weight: 400;
-  font-style: normal;
-  h2 {
-    font-size: 20px;
-    margin-bottom: 45px;
-    color: #fffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      border-radius: 20px;
+      color: white;
+      box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+      background-color: rgba(0, 0, 0, 0.7);
+      font-family: "Press Start 2P", system-ui;
+      font-weight: 400;
+      font-style: normal;
+      h2 {
+        font - size: 20px;
+      margin-bottom: 45px;
+      color: #fffff;
   }
-  p {
-    font-size: 22px;
-    margin-bottom: 25px;
-    color: #ffffff;
+      p {
+        font - size: 22px;
+      margin-bottom: 25px;
+      color: #ffffff;
   }
-  button {
-    padding: 15px 30px;
-    font-size: 18px;
-    background-color: #ff4500;
-    border: none;
-    border-radius: 10px;
-    font-family: "Press Start 2P", system-ui;
-    font-weight: 400;
-    font-style: normal;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+      button {
+        padding: 15px 30px;
+      font-size: 18px;
+      background-color: #ff4500;
+      border: none;
+      border-radius: 10px;
+      font-family: "Press Start 2P", system-ui;
+      font-weight: 400;
+      font-style: normal;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
   }
-  button:hover {
-    background-color: #e03e00;
+      button:hover {
+        background - color: #e03e00;
   }
-`
+      `
 
 const ButtonContainer = styled.div`
-  display: flex;
-  gap: 20px; 
-  margin-top: 20px; 
-  font-family: "Press Start 2P", system-ui;
-  font-weight: 400;
-  font-style: normal;
-  button {
-    font-family: "Press Start 2P", system-ui;
-    font-weight: 400;
-    font-style: normal;
-    padding: 15px 30px;
-    font-size: 12px;
-    background-color: #28a745;
-    border: none;
-    border-radius: 10px;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+      font-family: "Press Start 2P", system-ui;
+      font-weight: 400;
+      font-style: normal;
+      button {
+        font - family: "Press Start 2P", system-ui;
+      font-weight: 400;
+      font-style: normal;
+      padding: 15px 30px;
+      font-size: 12px;
+      background-color: #28a745;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
   }
-  
-  button:hover {
-    background-color: #218838;
+
+      button:hover {
+        background - color: #218838;
   }
-`;
+      `;
 
 const GameOverContainer = styled(Background)`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  border-radius: 20px;
-  color: white;
-  font-family: "Press Start 2P", system-ui;
-  font-weight: 400;
-  font-style: normal;
-  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
-  h2 {
-    font-size: 36px;
-    margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      border-radius: 20px;
+      color: white;
+      font-family: "Press Start 2P", system-ui;
+      font-weight: 400;
+      font-style: normal;
+      box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+      h2 {
+        font - size: 36px;
+      margin-bottom: 20px;
   }
-  p {
-    font-size: 20px;
-    margin-bottom: 20px;
+      p {
+        font - size: 20px;
+      margin-bottom: 20px;
   }
-  button {
-    font-family: "Press Start 2P", system-ui;
-    font-weight: 400;
-    font-style: normal;
-    padding: 5px 5px;
-    font-size: 12px;
-    background-color: #28a745;
-    margin: 20px
-    border: none;
-    border-radius: 10px;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+      button {
+        font - family: "Press Start 2P", system-ui;
+      font-weight: 400;
+      font-style: normal;
+      padding: 5px 5px;
+      font-size: 12px;
+      background-color: #28a745;
+      margin: 20px;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
   }
-  button:hover {
-    background-color: #218838;
+      button:hover {
+        background - color: #218838;
   }
-`;
+      `;
