@@ -1257,8 +1257,8 @@ function App() {
   ]
 
 
-  const flowAddress_NFT = "0xd86E2e2DC26E19F318737849d9FE4A229241Ca38";
-  const flowAddress_ERC = "0x24Fd0056fa257dcEB08F228c4798f755e839c6D1";
+  const flowAddress_NFT = "0xa3eea69c85932B9598454Fd713adeFab0671c4d5";
+  const flowAddress_ERC = "0x013449797df60d62FA747D51c88dE8D875083B61";
 
   //Changing the game values based on the activities done in the game.
   const [isStart, setIsStart] = useState(false);

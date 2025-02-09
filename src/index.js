@@ -10,7 +10,7 @@ root.render(
   <React.StrictMode>
     <DynamicContextProvider
       settings={{
-        environmentId: '1ab0315b-cde0-4004-ab46-53a2033a410b',
+        environmentId: '09e57ca9-5204-43cd-8626-c41dd4eba386',
         walletConnectors: [EthereumWalletConnectors],
       }}>
       <App />
